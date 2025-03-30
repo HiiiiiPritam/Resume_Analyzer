@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Resume</title>
+</head>
+<body>
+    <h2>Upload Resume</h2>
+    
+    <form id="resumeForm">
+        {% csrf_token %}
+        <input type="file" id="resumeFile" name="resume" required>
+        <button type="submit">Upload</button>
+    </form>
+
+    <h3>Extracted Information:</h3>
+    <p><strong>Email:</strong> <span id="email"></span></p>
+    <p><strong>Phone:</strong> <span id="phone"></span></p>
+
+    <script>
+      document.getElementById("resumeForm").addEventListener("submit", async function(event) {
+          event.preventDefault();
+  
+          let formData = new FormData();
+          let fileInput = document.getElementById("resumeFile").files[0];
+          formData.append("resume", fileInput);
+  
+          let csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+  
+          try {
+              let response = await fetch("{% url 'resume-upload' %}", {
+                  method: "POST",
+                  headers: { "X-CSRFToken": csrfToken },
+                  body: formData
+              });
+  
+              if (response.ok) {
+                  // Redirect to result page after successful upload
+                  {% comment %} window.location.href = "{% url 'result-page' %}"; {% endcomment %}
+              } else {
+                  alert("Error uploading resume.");
+              }
+          } catch (error) {
+              console.error(error);
+              alert("Something went wrong!");
+          }
+      });
+  </script>
+  
+</body>
+</html>
